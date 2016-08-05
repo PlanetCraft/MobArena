@@ -13,7 +13,6 @@ import com.garbagemule.MobArena.commands.admin.*;
 import com.garbagemule.MobArena.commands.setup.*;
 import com.garbagemule.MobArena.framework.ArenaMaster;
 import org.bukkit.conversations.Conversable;
-import org.bukkit.entity.Player;
 
 public class CommandHandler implements CommandExecutor
 {
