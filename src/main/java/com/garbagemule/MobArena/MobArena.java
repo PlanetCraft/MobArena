@@ -23,6 +23,7 @@ import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.garbagemule.MobArena.commands.CommandHandler;
+import com.garbagemule.MobArena.commands.CommandRewrite;
 import com.garbagemule.MobArena.framework.Arena;
 import com.garbagemule.MobArena.framework.ArenaMaster;
 import com.garbagemule.MobArena.listeners.MAGlobalListener;
@@ -39,6 +40,10 @@ import com.garbagemule.MobArena.waves.ability.AbilityManager;
  */
 public class MobArena extends JavaPlugin
 {
+	
+	private static MobArena i;
+	public static MobArena get() { return i; }
+	
     private ArenaMaster arenaMaster;
     private CommandHandler commandHandler;
     
@@ -56,6 +61,9 @@ public class MobArena extends JavaPlugin
     public static Random random = new Random();
 
     public void onEnable() {
+    	// Store our instance 
+    	i = this;
+    	 
         // Initialize config-file
         configFile = new File(getDataFolder(), "config.yml");
         config = new YamlConfiguration();
@@ -98,6 +106,9 @@ public class MobArena extends JavaPlugin
     }
     
     public void onDisable() {
+    	// Disable Listeners
+    	CommandRewrite.disable();
+    	
         // Force all arenas to end.
         if (arenaMaster == null) return;
         for (Arena arena : arenaMaster.getArenas()) {
@@ -211,6 +222,8 @@ public class MobArena extends JavaPlugin
         
         PluginManager pm = this.getServer().getPluginManager();
         pm.registerEvents(new MAGlobalListener(this, arenaMaster), this);
+        
+        CommandRewrite.enable();
     }
     
     // Permissions stuff
