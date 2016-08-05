@@ -360,6 +360,8 @@ public class ArenaListener
             case LAVA:
                 event.setCancelled(true);
                 break;
+			default :
+				break;
         }
     }
 

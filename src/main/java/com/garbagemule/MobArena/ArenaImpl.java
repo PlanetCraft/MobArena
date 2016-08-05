@@ -1311,6 +1311,8 @@ public class ArenaImpl implements Arena
                     case MINECART:
                     case BOAT:
                         e.remove();
+					default:
+						break;
                 }
             }
         }

@@ -300,6 +300,8 @@ public class SetupCommand implements Command, Listener {
             switch (action) {
                 case LEFT_CLICK_BLOCK:  regions(lower, loc); return true;
                 case RIGHT_CLICK_BLOCK: regions(upper, loc); return true;
+				default :
+					break;
             }
             return false;
         }
@@ -322,6 +324,8 @@ public class SetupCommand implements Command, Listener {
                     }
                     next = formatYellow("Current warp: %s", warpArray[warpIndex]);
                     return true;
+				default :
+					break;
             }
             return false;
         }
@@ -336,8 +340,9 @@ public class SetupCommand implements Command, Listener {
             switch (event.getAction()) {
                 case LEFT_CLICK_BLOCK:  spawns(l, true);  return true;
                 case RIGHT_CLICK_BLOCK: spawns(l, false); return true;
+				default :
+					return false;
             }
-            return false;
         }
 
         private boolean chests(PlayerInteractEvent event) {
@@ -349,8 +354,9 @@ public class SetupCommand implements Command, Listener {
             switch (event.getAction()) {
                 case LEFT_CLICK_BLOCK:  chests(b, true);  return true;
                 case RIGHT_CLICK_BLOCK: chests(b, false); return true;
+				default :
+					return false;
             }
-            return false;
         }
 
         private void fix(Location loc) {
