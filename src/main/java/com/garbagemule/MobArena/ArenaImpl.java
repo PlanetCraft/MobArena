@@ -97,6 +97,7 @@ public class ArenaImpl implements Arena
     private AutoStartTimer autoStartTimer;
     private StartDelayTimer startDelayTimer;
     private boolean isolatedChat;
+    private String prefix;
     
     // Scoreboards
     private ScoreboardManager scoreboard;
@@ -173,6 +174,9 @@ public class ArenaImpl implements Arena
         
         // Scoreboards
         this.scoreboard = (settings.getBoolean("use-scoreboards", true) ? new ScoreboardManager(this) : new NullScoreboardManager(this));
+        
+        // Prefix
+        this.prefix = settings.getString("prefix", "&3[&4MobArena&3]&f");
     }
     
     
@@ -373,8 +377,22 @@ public class ArenaImpl implements Arena
         return scoreboard;
     }
     
+    private String cachePrefix = null;
     
+    @Override
+    public String getPrefix() {
+    	if (cachePrefix == null) cachePrefix = ChatColor.translateAlternateColorCodes('&', this.prefix);
+    	
+    	return cachePrefix;
+    }
     
+    @Override
+    public void setPrefix(String newPrefix) {
+    	this.prefix = newPrefix;
+    	this.cachePrefix = null;
+    	
+    	settings.set("prefix", newPrefix);
+    }
     
     
     

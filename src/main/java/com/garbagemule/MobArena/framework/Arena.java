@@ -108,6 +108,9 @@ public interface Arena
     
     public ScoreboardManager getScoreboard();
     
+    public String getPrefix();
+    
+    public void setPrefix(String prefix);
     
     
     
