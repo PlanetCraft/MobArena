@@ -1,5 +1,5 @@
-name: ${project.name}
-author: garbagemule
+name: PCMobArena
+authors: [MarkehMe, garbagemule]
 main: com.garbagemule.MobArena.MobArena
 version: ${project.version}
 softdepend: [Multiverse-Core,Towny,Heroes,MagicSpells,Vault]
