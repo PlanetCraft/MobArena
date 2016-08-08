@@ -1,4 +1,9 @@
-# MobArena
+# MobArena by PlanetCraft
+
+## Noteable Changes
+* Join Sign: Create a join sign for the arena (see the wiki)
+* Scoreboard Sign: It's creation has been changed (see the wiki)
+* Prefixes: you can change the prefix per-arena used by signs and messages 
 
 ## Usage
 
