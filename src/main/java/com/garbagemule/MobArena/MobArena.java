@@ -9,6 +9,7 @@ import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.milkbowl.vault.economy.EconomyResponse.ResponseType;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -43,6 +44,10 @@ public class MobArena extends JavaPlugin
 	
 	private static MobArena i;
 	public static MobArena get() { return i; }
+	
+	public static String JOIN_TEXT = ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "Join";
+	public static String IN_USE = ChatColor.RED + "" + ChatColor.BOLD + "In use";
+	public static String CLOSED = ChatColor.RED + "" + ChatColor.BOLD + "Closed";
 	
     private ArenaMaster arenaMaster;
     private CommandHandler commandHandler;

@@ -1,4 +1,4 @@
-name: PCMobArena
+name: MobArena
 authors: [MarkehMe, garbagemule]
 main: com.garbagemule.MobArena.MobArena
 version: ${project.version}

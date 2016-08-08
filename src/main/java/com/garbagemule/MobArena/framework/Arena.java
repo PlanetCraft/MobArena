@@ -8,6 +8,7 @@ import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.garbagemule.MobArena.ArenaClass;
@@ -109,6 +110,8 @@ public interface Arena
     public ScoreboardManager getScoreboard();
     
     public String getPrefix();
+    
+    public String getPrefix(Boolean raw);
     
     public void setPrefix(String prefix);
     
@@ -248,4 +251,15 @@ public interface Arena
     public Player getLastPlayerStanding();
 
     public AutoStartTimer getAutoStartTimer();
+    
+    public void updateSign();
+    
+    public void updateSign(SignChangeEvent event);
+    
+    public void setSignLocation(Location location);
+    
+    public void setSignLocation(Location location, SignChangeEvent event);
+    
+    
+    
 }

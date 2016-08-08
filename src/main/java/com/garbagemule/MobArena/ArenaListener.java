@@ -194,7 +194,7 @@ public class ArenaListener
             arena.addRepairable(r);
             
             if (!softRestoreDrops)
-                b.setTypeId(0);
+                b.setType(Material.AIR);
             return true;
         }
 
@@ -344,7 +344,7 @@ public class ArenaListener
                     if (b.getType() == Material.TNT) {
                         Player planter = getPlanter(b);
                         if (planter != null) {
-                            b.setTypeId(0);
+                            b.setType(Material.AIR);
                             TNTPrimed tnt = b.getWorld().spawn(b.getLocation(), TNTPrimed.class);
                             setPlanter(tnt, planter);
                         }
@@ -452,7 +452,7 @@ public class ArenaListener
             if (mat == Material.CAKE_BLOCK || mat == Material.WATER || mat == Material.LAVA)
                 arena.removeBlock(b);
             else if (arena.removeBlock(b))
-                arena.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(state.getTypeId(), 1));
+                arena.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(state.getType(), 1));
             else if (softRestore)
                 arena.addRepairable(r);
             else
@@ -747,7 +747,7 @@ public class ArenaListener
         if (ap != null) {
             ArenaClass ac = ap.getArenaClass();
             if (ac != null && ac.hasUnbreakableWeapons()) {
-                repair(p.getItemInHand());
+                repair(p.getInventory().getItemInMainHand());
             }
         }
     }
@@ -942,7 +942,7 @@ public class ArenaListener
             return;
 
         if (!arena.isRunning()) {
-            event.getBlockClicked().getRelative(event.getBlockFace()).setTypeId(0);
+            event.getBlockClicked().getRelative(event.getBlockFace()).setType(Material.AIR);
             event.setCancelled(true);
             return;
         }
@@ -950,7 +950,7 @@ public class ArenaListener
         Block liquid = event.getBlockClicked().getRelative(event.getBlockFace());
         arena.addBlock(liquid);
     }
-
+    
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player p = event.getPlayer();
         if (!arena.inLobby(p)) return;
@@ -967,7 +967,7 @@ public class ArenaListener
             return;
 
         // Iron block
-        if (event.getClickedBlock().getTypeId() == 42) {
+        if (event.getClickedBlock().getType() == Material.IRON_BLOCK) {
             handleReadyBlock(p);
         }
         // Sign
@@ -988,6 +988,7 @@ public class ArenaListener
     }
 
     private void handleSign(Sign sign, Player p) {
+    	    	
         // Check if the first line is a class name.
         String className = ChatColor.stripColor(sign.getLine(0)).toLowerCase();
 

@@ -1,9 +1,12 @@
 package com.garbagemule.MobArena.listeners;
 
 import org.bukkit.ChatColor;
+import org.bukkit.block.Sign;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.hanging.HangingBreakEvent;
@@ -86,29 +89,77 @@ public class MAGlobalListener implements Listener
         for (Arena arena : am.getArenas())
             arena.getEventListener().onBlockPlace(event);
     }
+    
+    @EventHandler
+    public void onJoinSign(PlayerInteractEvent event) {
+        Player p = event.getPlayer();
+        
+        if (event.hasBlock() && ! (event.getClickedBlock().getState() instanceof Sign) || p.isSneaking()) return;
+
+    	Sign sign = (Sign) event.getClickedBlock().getState();
+    	
+    	for (Arena arena : this.am.getArenas()) {
+    		
+    		if (arena.getPrefix().equalsIgnoreCase(sign.getLine(0))) {
+                event.setUseItemInHand(Result.DENY);
+                event.setCancelled(true);
+                
+                p.performCommand("ma join " + arena.arenaName());
+                
+                return;
+    		}
+        }
+
+    }
+
 
     @EventHandler(priority = EventPriority.NORMAL)
-    public void signChange(SignChangeEvent event) {
-        if (!event.getPlayer().hasPermission("mobarena.setup.leaderboards")) {
-            return;
+    public void signChange(final SignChangeEvent event) {
+    	Player player = event.getPlayer();
+    	
+        if ( ! player.hasPermission("mobarena.setup.leaderboards") && 
+        		! player.hasPermission("mobarena.setup.joinsign") &&
+        		! player.isOp()) return;
+        
+        if ( ! event.getLine(0).startsWith("[MA]")) return;
+        
+        final Arena arena = am.getArenaWithName(event.getLine(1));
+        if (arena == null) {
+        	Messenger.tell(event.getPlayer(), "Unknown arena " + event.getLine(1));
+        	return;
+        }  
+        
+        String action = event.getLine(2);
+        
+        // 0 [MA]
+        // 1 arena
+        // 2 leaderboard
+        // 3 act
+        if (action.equalsIgnoreCase("leaderboard") && (player.hasPermission("mobarena.setup.leaderboards") || player.isOp())) {  
+        	// Leader board
+        	String text = event.getLine(3);
+        	Stats stat;
+            
+        	if (text == "") {
+	            arena.getEventListener().onSignChange(event);
+	            setSignLines(event, arena.getPrefix(), ChatColor.YELLOW + arena.arenaName(), ChatColor.AQUA + "Players", "---------------");
+	        } else if ((stat = Stats.getByShortName(text)) != null) {
+	            setSignLines(event, "", "", ChatColor.AQUA + stat.getFullName(), "---------------");
+	        }
+        	
+            Messenger.tell(event.getPlayer(), "Leaderboard sign created.");
+
+        } else if (action.equalsIgnoreCase("join") && (player.hasPermission("mobarena.setup.joinsign") || player.isOp())) {
+        	arena.setSignLocation(event.getBlock().getLocation(), event);
+        	Messenger.tell(event.getPlayer(), "Join sign created.");
+        } else {
+        	if (action.equalsIgnoreCase("join") || action.equalsIgnoreCase("leaderboard")) {
+                Messenger.tell(event.getPlayer(), "No permission for action " + action);
+        		return;
+        	}
+            Messenger.tell(event.getPlayer(), "Unknown action " + action);
         }
         
-        if (!event.getLine(0).startsWith("[MA]")) {
-            return;
-        }
-        
-        String text = event.getLine(0).substring((4));
-        Arena arena;
-        Stats stat;
-        
-        if ((arena = am.getArenaWithName(text)) != null) {
-            arena.getEventListener().onSignChange(event);
-            setSignLines(event, ChatColor.GREEN + "MobArena", ChatColor.YELLOW + arena.arenaName(), ChatColor.AQUA + "Players", "---------------");
-        }
-        else if ((stat = Stats.getByShortName(text)) != null) {
-            setSignLines(event, ChatColor.GREEN + "", "", ChatColor.AQUA + stat.getFullName(), "---------------");
-            Messenger.tell(event.getPlayer(), "Stat sign created.");
-        }
     }
     
     private void setSignLines(SignChangeEvent event, String s1, String s2, String s3, String s4) {

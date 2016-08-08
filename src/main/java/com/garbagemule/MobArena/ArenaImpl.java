@@ -17,6 +17,7 @@ import com.garbagemule.MobArena.util.Delays;
 import com.garbagemule.MobArena.util.Enums;
 import com.garbagemule.MobArena.util.ItemParser;
 import com.garbagemule.MobArena.util.TextUtils;
+import com.garbagemule.MobArena.util.config.ConfigUtils;
 import com.garbagemule.MobArena.util.inventory.InventoryManager;
 import com.garbagemule.MobArena.util.inventory.InventoryUtils;
 import com.garbagemule.MobArena.util.timer.AutoStartTimer;
@@ -26,8 +27,10 @@ import com.garbagemule.MobArena.waves.WaveManager;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.*;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -105,6 +108,11 @@ public class ArenaImpl implements Arena
     // Last player standing
     private Player lastStanding;
     
+    // Join sign
+    private World joinSignWorld;
+    private Location joinSign;
+    
+    
     /**
      * Primary constructor. Requires a name and a world.
      */
@@ -176,7 +184,13 @@ public class ArenaImpl implements Arena
         this.scoreboard = (settings.getBoolean("use-scoreboards", true) ? new ScoreboardManager(this) : new NullScoreboardManager(this));
         
         // Prefix
-        this.prefix = settings.getString("prefix", "&3[&4MobArena&3]&f");
+        this.prefix = settings.getString("prefix", "&f[&eMobArena&f]");
+        
+        this.joinSignWorld = Bukkit.getWorld(settings.getString("joinSignWorld"));
+        this.joinSign = ConfigUtils.parseLocation(this.settings, "joinSign", this.joinSignWorld);
+        
+        // Now update the sign
+        this.updateSign();
     }
     
     
@@ -214,6 +228,7 @@ public class ArenaImpl implements Arena
     public void setEnabled(boolean value) {
         enabled = value;
         settings.set("enabled", enabled);
+        this.updateSign();
     }
 
     @Override
@@ -387,6 +402,13 @@ public class ArenaImpl implements Arena
     }
     
     @Override
+    public String getPrefix(Boolean raw) {
+    	if (raw) return this.prefix;
+    	
+    	else return this.getPrefix();
+    }
+    
+    @Override
     public void setPrefix(String newPrefix) {
     	this.prefix = newPrefix;
     	this.cachePrefix = null;
@@ -482,6 +504,9 @@ public class ArenaImpl implements Arena
         // Set the boolean.
         running = true;
         
+        // Update the sign
+        this.updateSign();
+        
         // Spawn pets (must happen after 'running = true;')
         spawnPets();
         
@@ -552,6 +577,9 @@ public class ArenaImpl implements Arena
         
         // Restore enabled status.
         enabled = en;
+        
+        // Update the sign
+        this.updateSign();
         
         return true;
     }
@@ -734,7 +762,7 @@ public class ArenaImpl implements Arena
     private void clearInv(Player p) {
         InventoryView view = p.getOpenInventory();
         if (view != null) {
-            view.setCursor(new ItemStack(0));
+            view.setCursor(new ItemStack(Material.AIR));
             view.getBottomInventory().clear();
             view.close();
         }
@@ -760,7 +788,6 @@ public class ArenaImpl implements Arena
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public void revivePlayer(Player p) {
         Delays.douse(plugin, p, 1);
         removeClassPermissions(p);
@@ -1171,7 +1198,7 @@ public class ArenaImpl implements Arena
         // Check the remaining slots for weapons
         if (arenaClass.hasUnbreakableWeapons()) {
             for (ItemStack stack : contents) {
-                if (stack != null && arenaClass.isWeapon(stack)) {
+                if (stack != null && ArenaClass.isWeapon(stack)) {
                     stack.setDurability(Short.MIN_VALUE);
                 }
             }
@@ -1290,7 +1317,7 @@ public class ArenaImpl implements Arena
     
     private void removeBlocks() {
         for (Block b : blocks) {
-            b.setTypeId(0);
+            b.setType(Material.AIR);
         }
         blocks.clear();
     }
@@ -1342,7 +1369,70 @@ public class ArenaImpl implements Arena
             r.repair();
     }
     
+    // ----------------------------------------
+    //
+    // ----------------------------------------
     
+    public void updateSign(SignChangeEvent event) {
+
+    	if (this.joinSign == null) {
+    		Bukkit.getConsoleSender().sendMessage("[ma] joinSign is null");
+    		return;
+    	}
+    	
+    	BlockState blockState = null;
+    	Sign sign = null;
+    	
+    	if (event == null) {
+    		blockState = world.getBlockAt(this.joinSign).getState();
+	
+        	if ( ! (blockState instanceof Sign)) {
+        		Bukkit.getConsoleSender().sendMessage("[ma] blockState not sign");
+        		return;
+        	}
+        	
+        	sign = (Sign) blockState;
+    	}
+    	
+    	if (event != null) event.setLine(0, this.getPrefix());
+    	else sign.setLine(0, this.getPrefix());
+    	
+    	if (event != null) event.setLine(1, ChatColor.UNDERLINE + this.arenaName());
+    	else  sign.setLine(1, ChatColor.UNDERLINE + this.arenaName());
+    	
+    	if (this.isEnabled()) {
+        	if (event != null) event.setLine(2, MobArena.JOIN_TEXT);
+        	else sign.setLine(2, MobArena.JOIN_TEXT);
+    	} else if(this.isRunning()) {
+        	if (event != null) event.setLine(2, MobArena.IN_USE);
+        	else sign.setLine(2, MobArena.IN_USE);
+    	} else {
+        	if (event != null) event.setLine(2, MobArena.CLOSED);
+        	else sign.setLine(2, MobArena.CLOSED);
+    	}
+    	
+    	if (event != null) event.setLine(3, " ");
+    	else sign.setLine(3, " ");
+    	    	
+    	if (sign != null) sign.update(true);
+    }
+    
+    public void updateSign() { updateSign(null); }
+    
+    public void setSignLocation(Location location, SignChangeEvent event) {
+    	this.joinSign = location;
+    	this.joinSignWorld = location.getWorld();
+    	this.settings.set("joinSignWorld", this.joinSignWorld.getName());
+    	ConfigUtils.setLocation(this.settings, "joinSign", location);
+    	this.updateSign(event);
+    }
+    
+    public void setSignLocation(Location location) {
+    	setSignLocation(location, null);
+    }
+    
+    
+
     
     /*////////////////////////////////////////////////////////////////////
     //

@@ -2,6 +2,7 @@ world: ''
 enabled: true
 protect: true
 entry-fee: ''
+prefix: '[MobArena]'
 clear-wave-before-next: false
 clear-boss-before-next: false
 clear-wave-before-boss: false
@@ -40,3 +41,4 @@ isolated-chat: false
 global-join-announce: false
 global-end-announce: false
 show-death-messages: true
+joinSign: ''

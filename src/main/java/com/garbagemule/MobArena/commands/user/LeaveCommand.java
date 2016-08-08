@@ -15,11 +15,11 @@ import com.garbagemule.MobArena.framework.ArenaMaster;
     desc    = "leave the arena",
     permission = "mobarena.use.leave"
 )
-public class LeaveCommand implements Command
-{
+public class LeaveCommand implements Command {
+	
     @Override
     public boolean execute(ArenaMaster am, CommandSender sender, String... args) {
-        if (!Commands.isPlayer(sender)) {
+        if ( ! Commands.isPlayer(sender)) {
             Messenger.tell(sender, Msg.MISC_NOT_FROM_CONSOLE);
             return true;
         }
@@ -37,7 +37,7 @@ public class LeaveCommand implements Command
         }
         
         if (arena.playerLeave(p)) {
-            Messenger.tell(p, Msg.LEAVE_PLAYER_LEFT);
+            Messenger.tell(p, Msg.LEAVE_PLAYER_LEFT, arena);
         }
         return true;
     }
