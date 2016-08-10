@@ -1,5 +1,7 @@
 package com.garbagemule.MobArena.commands.user;
 
+import java.util.Optional;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -29,11 +31,13 @@ public class LeaveCommand implements Command {
 
         Arena arena = am.getArenaWithPlayer(p);  
         if (arena == null) {
-            arena = am.getArenaWithSpectator(p);
-            if (arena == null) {
+            Optional<Arena> spectatingArena = am.getArenaWithSpectator(p);
+            if ( ! spectatingArena.isPresent()) {
                 Messenger.tell(p, Msg.LEAVE_NOT_PLAYING);
-                return true;
+
+            	return true;
             }
+            arena = spectatingArena.get();
         }
         
         if (arena.playerLeave(p)) {
