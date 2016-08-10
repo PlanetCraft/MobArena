@@ -94,7 +94,7 @@ public class MAGlobalListener implements Listener
     public void onJoinSign(PlayerInteractEvent event) {
         Player p = event.getPlayer();
         
-        if (event.hasBlock() && ! (event.getClickedBlock().getState() instanceof Sign) || p.isSneaking()) return;
+        if ( ! event.hasBlock() || ! (event.getClickedBlock().getState() instanceof Sign) || p.isSneaking()) return;
 
     	Sign sign = (Sign) event.getClickedBlock().getState();
     	
