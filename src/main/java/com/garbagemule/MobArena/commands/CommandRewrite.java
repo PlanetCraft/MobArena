@@ -1,5 +1,7 @@
 package com.garbagemule.MobArena.commands;
 
+import java.util.Optional;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -27,9 +29,9 @@ public class CommandRewrite implements Listener {
 		
         Arena arena = am.getArenaWithPlayer(p);  
         if (arena == null) {
-            arena = am.getArenaWithSpectator(p);
-            if (arena == null) return;
-            
+            Optional<Arena> spectatingArena = am.getArenaWithSpectator(p);
+            if ( ! spectatingArena.isPresent()) return;
+            arena = spectatingArena.get();
         }
         
         String msg = event.getMessage();

@@ -1,11 +1,13 @@
 package com.garbagemule.MobArena;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -87,11 +89,11 @@ public class ArenaMasterImpl implements ArenaMaster
     }
 
     public List<Arena> getArenas() {
-        return arenas;
+        return Collections.unmodifiableList(new ArrayList<Arena>(arenas));
     }
 
     public Map<String, ArenaClass> getClasses() {
-        return classes;
+        return Collections.unmodifiableMap(new HashMap<String, ArenaClass>(classes));
     }
 
     public void addPlayer(Player p, Arena arena) {
@@ -121,27 +123,27 @@ public class ArenaMasterImpl implements ArenaMaster
     }
     
     public List<Arena> getEnabledArenas(List<Arena> arenas) {
-        List<Arena> result = new ArrayList<Arena>(arenas.size());
+        List<Arena> result = new ArrayList<Arena>();
         for (Arena arena : arenas)
             if (arena.isEnabled()) 
                 result.add(arena);
-        return result;
+        return Collections.unmodifiableList(result);
     }
 
     public List<Arena> getPermittedArenas(Player p) {
-        List<Arena> result = new ArrayList<Arena>(arenas.size());
+        List<Arena> result = new ArrayList<Arena>();
         for (Arena arena : arenas)
             if (plugin.has(p, "mobarena.arenas." + arena.configName()))
                 result.add(arena);
-        return result;
+        return Collections.unmodifiableList(result);
     }
 
     public List<Arena> getEnabledAndPermittedArenas(Player p) {
-        List<Arena> result = new ArrayList<Arena>(arenas.size());
+        List<Arena> result = new ArrayList<Arena>();
         for (Arena arena : arenas)
             if (arena.isEnabled() && plugin.has(p, "mobarena.arenas." + arena.configName()))
                 result.add(arena);
-        return result;
+        return Collections.unmodifiableList(result);
     }
 
     public Arena getArenaAtLocation(Location loc) {
@@ -156,14 +158,14 @@ public class ArenaMasterImpl implements ArenaMaster
         for (Arena arena : arenas)
             if (arena.getWorld().equals(world))
                 result.add(arena);
-        return result;
+        return Collections.unmodifiableList(result);
     }
 
     public List<Player> getAllPlayers() {
         List<Player> result = new ArrayList<Player>(arenas.size());
         for (Arena arena : arenas)
             result.addAll(arena.getAllPlayers());
-        return result;
+        return Collections.unmodifiableList(result);
     }
 
     public List<Player> getAllPlayersInArena(String arenaName) {
@@ -191,12 +193,12 @@ public class ArenaMasterImpl implements ArenaMaster
         return arenaMap.get(plugin.getServer().getPlayer(playerName));
     }
 
-    public Arena getArenaWithSpectator(Player p) {
+    public Optional<Arena> getArenaWithSpectator(Player p) {
         for (Arena arena : arenas) {
             if (arena.getSpectators().contains(p))
-                return arena;
+                return Optional.of(arena);
         }
-        return null;
+        return Optional.empty();
     }
 
     public Arena getArenaWithMonster(Entity e) {

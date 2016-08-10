@@ -2,6 +2,7 @@ package com.garbagemule.MobArena;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -34,7 +35,11 @@ public class Messenger
             if (arena == null) {
 	        	arena = MobArena.get().getArenaMaster().getArenaWithPlayer((Player) p);
 	            if (arena == null) {
-	            	arena = MobArena.get().getArenaMaster().getArenaWithSpectator((Player) p);
+	            	Optional<Arena> arenaSpectator = MobArena.get().getArenaMaster().getArenaWithSpectator((Player) p);
+	            	
+	            	if ( ! arenaSpectator.isPresent()) return true;
+	            	
+	            	arena = arenaSpectator.get();
 	            }
             }
             

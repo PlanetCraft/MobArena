@@ -3,6 +3,7 @@ package com.garbagemule.MobArena.framework;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -74,7 +75,7 @@ public interface ArenaMaster
     
     public Arena getArenaWithPlayer(String playerName);
     
-    public Arena getArenaWithSpectator(Player p);
+    public Optional<Arena> getArenaWithSpectator(Player p);
     
     public Arena getArenaWithMonster(Entity e);
     
