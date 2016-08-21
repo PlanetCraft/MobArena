@@ -39,14 +39,8 @@ public class CommandHandler implements CommandExecutor
             return true;
         }
         
-        // If there's no base argument, show a helpful message.
-        if (base.equals("")) {
-            Messenger.tell(sender, Msg.MISC_HELP);
-            return true;
-        }
-        
-        // The help command is a little special
-        if (base.equals("?") || base.equals("help")) {
+        // Show help, even if no command is specified 
+        if (base.equals("") || base.equals("?") || base.equals("help")) {
             showHelp(sender);
             return true;
         }
