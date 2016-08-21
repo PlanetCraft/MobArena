@@ -1,6 +1,7 @@
 package com.garbagemule.MobArena.listeners;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -94,8 +95,15 @@ public class MAGlobalListener implements Listener
     public void onJoinSign(PlayerInteractEvent event) {
         Player p = event.getPlayer();
         
-        if ( ! event.hasBlock() || ! (event.getClickedBlock().getState() instanceof Sign) || p.isSneaking()) return;
-
+        if ( ! event.hasBlock()) return;
+        if ( ! (event.getClickedBlock().getState() instanceof Sign)) return;
+        
+        if (event.getClickedBlock().getType() != Material.WALL_SIGN &&
+        	event.getClickedBlock().getType() != Material.SIGN_POST && 
+        	event.getClickedBlock().getType() != Material.SIGN) return;
+        	
+        if (p.isSneaking()) return;
+        
     	Sign sign = (Sign) event.getClickedBlock().getState();
     	
     	for (Arena arena : this.am.getArenas()) {
@@ -109,7 +117,6 @@ public class MAGlobalListener implements Listener
                 return;
     		}
         }
-
     }
 
 
